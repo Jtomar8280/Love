@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Little Love Letter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --midnight:#150c22;
+    --midnight2:#211430;
+    --plum:#3c2350;
+    --rose:#eab4d1;
+    --rose-deep:#d888b3;
+    --gold:#d9b872;
+    --cream:#f6ecdf;
+    --font-display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+    --font-body:'Jost','Century Gothic',Verdana,sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:inherit;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{
+    background:linear-gradient(180deg,var(--midnight) 0%,var(--midnight2) 55%,var(--plum) 100%);
+    color:var(--cream);
+    font-family:var(--font-body);
+    font-weight:300;
+    overflow-x:hidden;
+    min-height:100%;
+  }
+  img,canvas{max-width:100%}
+  .wrap{max-width:640px;margin:0 auto;padding:0 28px}
+  section{position:relative;padding:110px 0}
+
+  /* ---------- HERO ---------- */
+  #hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 28px}
+  #hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:22px}
+  .hero-mark{font-size:13px;letter-spacing:.4px;color:var(--rose);opacity:.85}
+  h1{font-family:var(--font-display);font-weight:600;font-size:clamp(2.4rem,7vw,4rem);line-height:1.08;max-width:11ch}
+  h1 em{font-style:italic;color:var(--rose)}
+  .hero-sub{font-size:clamp(.95rem,2vw,1.15rem);color:var(--cream);opacity:.85;min-height:1.6em;max-width:32ch}
+  .cursor{display:inline-block;width:1px;background:var(--rose);animation:blink 1s steps(1) infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  .scroll-cue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);font-size:12px;letter-spacing:.3px;color:var(--rose);opacity:.7;display:flex;flex-direction:column;align-items:center;gap:6px;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+  /* ---------- SECTION HEADS ---------- */
+  .kicker{font-family:var(--font-display);font-style:italic;color:var(--rose);font-size:1.05rem;margin-bottom:6px}
+  h2{font-family:var(--font-display);font-weight:600;font-size:clamp(1.7rem,4vw,2.3rem);margin-bottom:38px;opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s ease}
+  h2.in-view{opacity:1;transform:translateY(0)}
+
+  /* ---------- REASONS (flip cards) ---------- */
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:480px){.card-grid{grid-template-columns:1fr}}
+  .flip-card{perspective:1200px;height:168px}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;cursor:pointer}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid rgba(234,180,209,.25);display:flex;align-items:center;justify-content:center;text-align:center;padding:18px}
+  .flip-front{background:rgba(234,180,209,.06);flex-direction:column;gap:10px}
+  .flip-front .heart-mini{font-size:1.6rem;color:var(--rose-deep)}
+  .flip-front span{font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--rose)}
+  .flip-back{background:rgba(217,184,114,.1);transform:rotateY(180deg);font-size:.94rem;line-height:1.5}
+  .tap-hint{font-size:.75rem;opacity:.5;text-align:center;margin-top:14px}
+
+  /* ---------- STORY / TIMELINE ---------- */
+  .timeline{border-left:1px solid rgba(234,180,209,.3);margin-left:6px}
+  .tl-item{position:relative;padding:0 0 34px 26px;opacity:0;transform:translateY(10px);transition:opacity .7s ease,transform .7s ease}
+  .tl-item.in-view{opacity:1;transform:translateY(0)}
+  .tl-item::before{content:"";position:absolute;left:-5px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--gold)}
+  .tl-date{font-size:.78rem;letter-spacing:.3px;color:var(--gold);opacity:.9;margin-bottom:4px}
+  .tl-title{font-family:var(--font-display);font-weight:600;font-size:1.25rem;margin-bottom:4px}
+  .tl-desc{font-size:.93rem;opacity:.8;line-height:1.5}
+
+  /* ---------- LETTER ---------- */
+  .letter{background:linear-gradient(160deg,#efe3d0,#e8d8bd);color:#3a2a1c;border-radius:6px;padding:38px 32px;box-shadow:0 30px 60px -25px rgba(0,0,0,.6);transform:rotate(-1deg);font-family:var(--font-display);font-style:italic;font-size:clamp(1.05rem,2.4vw,1.25rem);line-height:1.7;white-space:pre-wrap;min-height:220px}
+  .letter-sign{display:block;margin-top:18px;text-align:right;font-weight:600}
+  .counter{margin-top:26px;text-align:center;font-size:.85rem;color:var(--rose);opacity:.85;letter-spacing:.2px}
+  .counter b{font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--gold)}
+
+  /* ---------- SURPRISE ---------- */
+  #surprise{text-align:center}
+  .press-btn{background:none;border:1px solid var(--rose);color:var(--rose);font-family:var(--font-body);font-size:.95rem;padding:14px 30px;border-radius:999px;cursor:pointer;transition:background .3s ease,color .3s ease,transform .2s ease}
+  .press-btn:hover{background:var(--rose);color:var(--midnight)}
+  .press-btn:active{transform:scale(.97)}
+  .surprise-msg{font-family:var(--font-display);font-style:italic;font-size:clamp(1.2rem,3vw,1.6rem);color:var(--gold);max-width:26ch;margin:26px auto 0;opacity:0;transition:opacity 1s ease}
+  .surprise-msg.show{opacity:1}
+  #burst-canvas{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+  footer{text-align:center;padding:60px 28px 90px;font-size:.85rem;opacity:.7}
+  .footer-heart{display:inline-block;color:var(--rose-deep);animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001s!important;transition-duration:.2s!important}
+  }
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <canvas id="particles"></canvas>
+  <div class="hero-inner">
+    <div class="hero-mark">a small corner of the internet</div>
+    <h1>made just for <em id="heroName">you</em></h1>
+    <div class="hero-sub" id="heroSub"><span id="typeTarget"></span><span class="cursor" id="cursorBlink"> </span></div>
+  </div>
+  <div class="scroll-cue">↓ scroll</div>
+</section>
+
+<section id="reasons">
+  <div class="wrap">
+    <div class="kicker">out of thousands</div>
+    <h2>a few reasons why</h2>
+    <div class="card-grid" id="cardGrid"></div>
+    <div class="tap-hint">tap a card to turn it over</div>
+  </div>
+</section>
+
+<section id="story">
+  <div class="wrap">
+    <div class="kicker">so far</div>
+    <h2>our story</h2>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</section>
+
+<section id="letter-section">
+  <div class="wrap">
+    <div class="kicker">for you, specifically</div>
+    <h2>a letter</h2>
+    <div class="letter" id="letterBox"></div>
+    <div class="counter" id="counter"></div>
+  </div>
+</section>
+
+<section id="surprise">
+  <div class="wrap">
+    <div class="kicker">one more thing</div>
+    <h2>press here</h2>
+    <button class="press-btn" id="pressBtn">open it</button>
+    <div class="surprise-msg" id="surpriseMsg"></div>
+  </div>
+</section>
+
+<canvas id="burst-canvas"></canvas>
+
+<footer>
+  made with Love by - <span id="footerFrom">me</span>
+</footer>
+
+<script>
+/* ======================================================================
+   PERSONALIZE HERE — edit this object with real names, dates and words.
+   ====================================================================== */
+const CONFIG = {
+  herName: "My Wife",
+  yourName: "Your Jatin",
+  subtitle: "This page doesn't do much. It just exists to remind you that someone, somewhere, is there for you loving you like he exists only for you.",
+  sinceDate: "2024-01-27",
+  reasons: [
+    { icon: "♥", short: "your Smile", full: "It makes my worst day perfect just by being there on your lovely face. I try my best to love you the way you want to see you smile all day." },
+    { icon: "✧", short: "small things", full: "The way you notice details other people miss make me feel loved. Sometimes it happens that you can't see some things but your love for me makes up for it." },
+    { icon: "☾", short: "late nights", full: "Every conversation that was supposed to end at midnight and didn't, because we had more to say." },
+    { icon: "❀", short: "just you", full: "Not a version of you. Not someone better than you. Not anyone else. Just — you, exactly as you are." }
+  ],
+  story: [
+    { date: "the beginning", title: "How we met", desc: "Just a small effort I thought was worthless. Became the best decision of my life now." },
+    { date: "a while later", title: "The first real conversation", desc: "The one where hours disappeared and neither of us noticed." },
+    { date: "The first meet", title: "A day worth a whole life", desc: "Alot of excitement. Abit of hesitation. Filled both of us with moments we won't forget ever." },
+    { date: "The unsasy Days", title: "The moment it felt to let go", desc: "There were moments this relationship felt heavy for both of us. But we got through all that together, I know things now are not good either but i'm really trying to fix things for good." },
+    { date: "today", title: "Still here", desc: "Still choosing this. Still choosing you." }
+  ],
+  letter: `My dearest Yanu,
+
+I know I mess up sometimes but that doesn't mean that I don't love you infact I love you more than anyone can imagine ever.
+
+Every part of my heart want only you to be in there. I want to love "you only" always forever. I want to fill your life with so much love that no other lover could ever show to their partner, not even "Laila-Majnu", not even "Heer-Ranjha" - NO-ONE. You are special for me in ways I can't even explain to you in a single letter.
+
+I don't know it will be enough or not to make-up for the things I have done in past few days. But still anything that makes you alil special i will do for you no matter if it is enough or not.
+
+Thank you for being the reason ordinary days feel like something. Thanks for coming into my life. Thanks for making me a part of your special life.`,
+  surpriseMessage: "I love you. Today, Tomorrow and every single day till the day come when my body gives up. Still my soul will love you even after that."
+};
+
+/* ---------- fill in content from CONFIG ---------- */
+document.getElementById('heroName').textContent = CONFIG.herName;
+document.getElementById('footerFrom').textContent = CONFIG.yourName;
+document.title = `For ${CONFIG.herName}`;
+
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- typewriter subtitle ---------- */
+(function typewriter(){
+  const el = document.getElementById('typeTarget');
+  const text = CONFIG.subtitle;
+  if(reduced){ el.textContent = text; return; }
+  let i = 0;
+  function step(){
+    el.textContent = text.slice(0, i);
+    i++;
+    if(i <= text.length) requestAnimationFrame(()=>setTimeout(step, 24));
+  }
+  step();
+})();
+
+/* ---------- reasons cards ---------- */
+const grid = document.getElementById('cardGrid');
+CONFIG.reasons.forEach(r=>{
+  const card = document.createElement('div');
+  card.className = 'flip-card';
+  card.innerHTML = `<div class="flip-inner">
+    <div class="flip-face flip-front"><div class="heart-mini">${r.icon}</div><span>${r.short}</span></div>
+    <div class="flip-face flip-back">${r.full}</div>
+  </div>`;
+  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  grid.appendChild(card);
+});
+
+/* ---------- timeline ---------- */
+const tl = document.getElementById('timeline');
+CONFIG.story.forEach(s=>{
+  const item = document.createElement('div');
+  item.className = 'tl-item';
+  item.innerHTML = `<div class="tl-date">${s.date}</div><div class="tl-title">${s.title}</div><div class="tl-desc">${s.desc}</div>`;
+  tl.appendChild(item);
+});
+
+/* ---------- letter typewriter (on view) ---------- */
+const letterBox = document.getElementById('letterBox');
+let letterTyped = false;
+function typeLetter(){
+  if(letterTyped) return;
+  letterTyped = true;
+  const text = CONFIG.letter + `\n`;
+  if(reduced){
+    letterBox.textContent = CONFIG.letter;
+    const sign = document.createElement('span');
+    sign.className='letter-sign'; sign.textContent = `— ${CONFIG.yourName}`;
+    letterBox.appendChild(sign);
+    return;
+  }
+  let i = 0;
+  function step(){
+    letterBox.textContent = text.slice(0, i);
+    i += 2;
+    if(i <= text.length){ setTimeout(step, 14); }
+    else {
+      const sign = document.createElement('span');
+      sign.className='letter-sign'; sign.textContent = `— ${CONFIG.yourName}`;
+      letterBox.appendChild(sign);
+    }
+  }
+  step();
+}
+
+/* ---------- live "time together" counter ---------- */
+const counterEl = document.getElementById('counter');
+const since = new Date(CONFIG.sinceDate + 'T00:00:00');
+function tickCounter(){
+  const now = new Date();
+  let diffMs = now - since;
+  if(diffMs < 0){ counterEl.textContent = ''; return; }
+  const totalSec = Math.floor(diffMs/1000);
+  const days = Math.floor(totalSec/86400);
+  const h = String(Math.floor((totalSec%86400)/3600)).padStart(2,'0');
+  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,'0');
+  const s = String(totalSec%60).padStart(2,'0');
+  counterEl.innerHTML = `<b>${days}</b> days, ${h}:${m}:${s} of this — and counting`;
+}
+tickCounter();
+setInterval(tickCounter, 1000);
+
+/* ---------- scroll reveal ---------- */
+const revealTargets = document.querySelectorAll('h2, .tl-item');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in-view');
+      if(e.target.id === 'letterBox' || e.target.closest('#letter-section')) typeLetter();
+    }
+  });
+},{threshold:0.3});
+revealTargets.forEach(t=>io.observe(t));
+io.observe(document.getElementById('letter-section'));
+
+/* ---------- hero particle background (hearts + fireflies) ---------- */
+(function particles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w,h,particlesArr;
+  function resize(){
+    w = canvas.width = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+  function makeParticles(){
+    const count = reduced ? 12 : (w < 500 ? 22 : 38);
+    particlesArr = Array.from({length:count}, ()=>({
+      x: Math.random()*w,
+      y: Math.random()*h,
+      vy: 0.15 + Math.random()*0.35,
+      vx: (Math.random()-0.5)*0.25,
+      size: 8 + Math.random()*14,
+      alpha: 0.15 + Math.random()*0.35,
+      heart: Math.random() > 0.45,
+      phase: Math.random()*Math.PI*2
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    particlesArr.forEach(p=>{
+      p.y -= p.vy;
+      p.x += p.vx + Math.sin(p.phase)*0.15;
+      p.phase += 0.01;
+      if(p.y < -20){ p.y = h+20; p.x = Math.random()*w; }
+      ctx.globalAlpha = p.alpha;
+      if(p.heart){
+        ctx.fillStyle = '#eab4d1';
+        ctx.font = p.size+'px serif';
+        ctx.fillText('♥', p.x, p.y);
+      } else {
+        ctx.fillStyle = '#d9b872';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size/8, 0, Math.PI*2);
+        ctx.fill();
+      }
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', ()=>{resize();});
+  resize(); makeParticles(); draw();
+})();
+
+/* ---------- surprise button + heart burst ---------- */
+const pressBtn = document.getElementById('pressBtn');
+const surpriseMsg = document.getElementById('surpriseMsg');
+let opened = false;
+pressBtn.addEventListener('click', ()=>{
+  if(!opened){
+    opened = true;
+    surpriseMsg.textContent = CONFIG.surpriseMessage;
+    surpriseMsg.classList.add('show');
+    pressBtn.textContent = 'once more?';
+    try{ localStorage.setItem('loveletter_opened','true'); }catch(e){}
+  }
+  burstHearts();
+});
+try{
+  if(localStorage.getItem('loveletter_opened') === 'true'){
+    pressBtn.textContent = 'once more?';
+  }
+}catch(e){}
+
+function burstHearts(){
+  const canvas = document.getElementById('burst-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const rect = pressBtn.getBoundingClientRect();
+  const originX = rect.left + rect.width/2, originY = rect.top;
+  const n = reduced ? 10 : 26;
+  const parts = Array.from({length:n}, ()=>({
+    x: originX, y: originY,
+    vx: (Math.random()-0.5)*6,
+    vy: -(2+Math.random()*5),
+    size: 10+Math.random()*14,
+    life: 1
+  }));
+  function frame(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    parts.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.012;
+      if(p.life > 0){
+        alive = true;
+        ctx.globalAlpha = Math.max(p.life,0);
+        ctx.fillStyle = '#d888b3';
+        ctx.font = p.size+'px serif';
+        ctx.fillText('♥', p.x, p.y);
+      }
+    });
+    ctx.globalAlpha = 1;
+    if(alive) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  frame();
+}
+</script>
+</body>
+</html>
